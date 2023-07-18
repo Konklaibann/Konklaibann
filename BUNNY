@@ -2,7 +2,6 @@ function myFunction() {
   var token = 'IY4828X7mhPheht8QX9Gnauldgl2hW4sZ0N32NE7ge9'
   var message = "สวัสดีบันนี่"
   sendLineNotify(message, token)
-  
 }
 
 function sendLineNotify(message, token) {
