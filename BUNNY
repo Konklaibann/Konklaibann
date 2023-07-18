@@ -1,42 +1,39 @@
-function myFunction() {
-  var token = 'y0SUiUhB35sH1Z8uWCG7y85bALa0gVi9LdmLxJnZSNi'
-  var ss = SpreadsheetApp.openById('ทดสอบบบบบบบบบบบบบบบบบบบบบบบบบบบบบบ')
-  var sh = ss.getSheetByName('Data_Notify')
-  var row = sh.getLastRow();
+var TokenNotify = "y0SUiUhB35sH1Z8uWCG7y85bALa0gVi9LdmLxJnZSNi";
 
-  var today = Utilities.formatDate(new Date(), "GMT+7", "dd/MM/yyyy")
-  var time = Utilities.formatDate(new Date(), "GMT+7", "HH:mm")
-  var timer = "09:30"
-  //var today = "18/07/2023"
-  Logger.log(today)
-  Logger.log(time)
-  //var message = "สวัสดี BUNNY"
-  //sendLineNotify(message, token)
+function doGet(e) {
+  
+  
+  var contents = e.parameter.contents;
 
-  for (i = 2; i <= row; i++) {
-    var date = Utilities.formatDate(sh.getRange(i,1).getValue(),"GMT+7", "dd/MM/yyyy")
-    //var timer = sh.getRange(i, 4).getValue()
-
-    if (today == date && time == timer) {
-      var msg1 = today + '\n'
-      //var msg1 = sh.getRange(i, 1).getValue() + '\n'
-      var msg2 = sh.getRange(i, 2).getValue() + '\n'
-      var msg3 = sh.getRange(i, 3).getValue() + '\n'
-      var msg4 = sh.getRange(i, 4).getValue() + '\n'
-      var msg5 = sh.getRange(i, 5).getValue() + '\n'
-      var message = '\n วันที่ : ' + msg1 + ' ชื่อ-สกุล : ' + msg2 + ' เบอร์โทร์ : ' + msg3 + ' รับผิดชอบ : ' + msg4 + ' ทำงานกะ : ' + msg5
-      sendLineNotify(message, token)
-    }
-  }
+  var sheet = SpreadsheetApp.getActiveSheet();
+  sheet.insertRowBefore(2);
+  sheet.getRange('A2').setBorder(true, true, true, true, false, false).setValue('=today()');
+  sheet.getRange('B2').setBorder(true, true, true, true, false, false).setValue(contents);
 }
 
-function sendLineNotify(message, token) {
-  var options = {
-    "method": "post",
-    "payload": {
-      "message": message,
-    },
-    "headers": { "Authorization": "Bearer " + token }
-  };
-  UrlFetchApp.fetch("https://notify-api.line.me/api/notify", options);
+function myFunction() {
+  var sheet = SpreadsheetApp.getActiveSheet();
+  var last_row = sheet.getLastRow();
+  
+  for(var i = 1; i <= last_row; i++) {
+    var target_deadline = new Date(sheet.getRange('A' + i).getValue());
+    var dDate = new Date();dDate.setDate(dDate.getDate());
+  
+    if(dDate.getYear() == target_deadline.getYear() && dDate.getMonth() == target_deadline.getMonth() && dDate.getDate() == target_deadline.getDate()) {
+      
+      var target_contens = sheet.getRange('B' + i).getValue();
+
+      var options = 
+          {
+            "method" : "post",
+            "headers" : {'Authorization': "Bearer " + TokenNotify},
+            "payload" : {"message" : target_contens}
+          };
+      UrlFetchApp.fetch("https://notify-api.line.me/api/notify", options);
+ 
+      sheet.deleteRow(i);
+      i--;
+      last_row--;
+    }
+  }
 }
